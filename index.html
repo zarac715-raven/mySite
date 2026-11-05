@@ -1,681 +1,715 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="dark">
+<html lang="en" class="scroll-smooth dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>明星精美桌布時鐘</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['Courier New', 'monospace']
-                    }
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phoenix Chang - Professional Portfolio</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e',
             }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans TC"', 'sans-serif'],
+          }
         }
-    </script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Outfit', 'Inter', sans-serif;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .glass-modal {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        /* 自定義滑動條 */
-        input[type="range"]::-webkit-slider-thumb {
-            background-color: #ec4899;
-        }
-        /* 淡入淡出轉場效果 */
-        .bg-fade {
-            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        /* 時鐘字型特效陰影 */
-        .clock-shadow {
-            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.8);
-        }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    @keyframes wave {
+      0%, 100% { height: 4px; }
+      50% { height: 18px; }
+    }
+    .animate-wave {
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .wave-1 { animation-delay: 0.0s; }
+    .wave-2 { animation-delay: 0.2s; }
+    .wave-3 { animation-delay: 0.4s; }
+    .wave-4 { animation-delay: 0.1s; }
+    .wave-5 { animation-delay: 0.3s; }
+  </style>
 </head>
-<body class="bg-black text-white h-screen w-screen overflow-hidden relative flex items-center justify-content">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen transition-colors duration-300">
 
-    <!-- 背景圖片容器 1 -->
-    <div id="bg-layer-1" class="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fade opacity-100 z-0"></div>
-    <!-- 背景圖片容器 2 (雙圖交替淡入淡出) -->
-    <div id="bg-layer-2" class="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fade opacity-0 z-0"></div>
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 text-sm font-medium border border-slate-700 dark:border-slate-200">
+    <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600 text-lg"></i>
+    <span id="toast-message">Notification message</span>
+  </div>
 
-    <!-- 遮罩層 (用於調整暗度和模糊度) -->
-    <div id="overlay-layer" class="absolute inset-0 bg-black/30 backdrop-blur-[0px] z-10 transition-all duration-500 pointer-events-none"></div>
-
-    <!-- 主要內容區 (可點擊隱藏 UI 享受純淨桌布) -->
-    <div id="main-ui" class="relative z-20 w-full h-full flex flex-col items-center justify-between p-6 md:p-12 transition-opacity duration-300">
-        
-        <!-- 頂部資訊列 (隱藏於極簡模式) -->
-        <header class="w-full flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 shadow-lg">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="photo-counter" class="text-xs md:text-sm font-medium tracking-wide text-white/90">載入圖片中...</span>
-            </div>
-
-            <div class="flex items-center space-x-3">
-                <!-- 全螢幕按鈕 -->
-                <button id="fullscreen-btn" title="全螢幕模式" class="w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 border border-white/10 flex items-center justify-center text-white/80 hover:text-white transition-all transform hover:scale-105 active:scale-95 shadow-lg">
-                    <i class="fa-solid fa-expand"></i>
-                </button>
-                <!-- 齒輪設定按鈕 -->
-                <button id="settings-toggle-btn" title="開啟設定" class="w-11 h-11 rounded-full bg-pink-600/80 hover:bg-pink-600 border border-pink-400/30 flex items-center justify-center text-white transition-all transform hover:rotate-90 hover:scale-105 active:scale-95 shadow-xl">
-                    <i class="fa-solid fa-gear text-lg"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- 中央時鐘與小工具區 -->
-        <main class="flex flex-col items-center justify-center text-center my-auto cursor-pointer" id="clock-container" title="點擊切換介面顯示/隱藏">
-            
-            <!-- 祝福語 / 個性簽名 -->
-            <div id="greeting-text" class="text-sm md:text-base font-light tracking-widest text-pink-300/90 mb-3 drop-shadow-md uppercase opacity-90 transition-all">
-                ✨ Have a wonderful day ✨
-            </div>
-
-            <!-- 數位時鐘本體 -->
-            <div class="clock-shadow flex items-baseline justify-center select-none">
-                <span id="clock-time" class="text-7xl sm:text-8xl md:text-9xl font-bold tracking-tight text-white font-mono">00:00</span>
-                <div class="flex flex-col ml-3 sm:ml-4 text-left justify-center h-full space-y-1">
-                    <span id="clock-seconds" class="text-2xl sm:text-3xl md:text-4xl font-semibold text-pink-400 font-mono">00</span>
-                    <span id="clock-ampm" class="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wider text-white/80">AM</span>
-                </div>
-            </div>
-
-            <!-- 日期與星期 -->
-            <div id="clock-date" class="mt-4 text-base sm:text-lg md:text-xl font-medium tracking-wide text-white/90 drop-shadow-md">
-                2026年11月1日 星期日
-            </div>
-        </main>
-
-        <!-- 底部切換控制列 (左右切換圖片) -->
-        <footer class="w-full flex justify-between items-center max-w-7xl mx-auto">
-            <button id="prev-btn" class="px-4 py-2.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/10 backdrop-blur-md text-white/80 hover:text-white text-sm flex items-center space-x-2 transition-all shadow-lg active:scale-95">
-                <i class="fa-solid fa-chevron-left"></i>
-                <span class="hidden sm:inline">上一張</span>
-            </button>
-
-            <!-- 快速切換圖片圓點指示器 -->
-            <div id="indicators-container" class="hidden md:flex space-x-1.5 max-w-md overflow-x-auto py-2 px-3 bg-black/20 backdrop-blur-md rounded-full border border-white/10">
-                <!-- 動態生成圓點 -->
-            </div>
-
-            <button id="next-btn" class="px-4 py-2.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/10 backdrop-blur-md text-white/80 hover:text-white text-sm flex items-center space-x-2 transition-all shadow-lg active:scale-95">
-                <span class="hidden sm:inline">下一張</span>
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
-        </footer>
-    </div>
-
-    <!-- 齒輪設定側邊抽屜 / 彈窗 -->
-    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
-        <div class="glass-modal w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl transform scale-95 transition-all duration-300 max-h-[90vh] overflow-y-auto">
-            
-            <!-- 標題列 -->
-            <div class="flex justify-between items-center pb-4 border-b border-white/10 mb-6">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-pink-600/30 border border-pink-500/40 flex items-center justify-center text-pink-400">
-                        <i class="fa-solid fa-sliders"></i>
-                    </div>
-                    <h2 class="text-xl font-bold tracking-wide">桌布與時鐘設定</h2>
-                </div>
-                <button id="settings-close-btn" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-all">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <!-- 設定選項內容 -->
-            <div class="space-y-6">
-                
-                <!-- 輪播間隔設定 -->
-                <div>
-                    <label class="block text-sm font-medium text-white/80 mb-2 flex justify-between">
-                        <span>圖片自動輪播速度</span>
-                        <span id="interval-val" class="text-pink-400 font-semibold">10 秒</span>
-                    </label>
-                    <input type="range" id="interval-slider" min="3" max="60" value="10" class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer">
-                    <div class="flex justify-between text-xs text-white/40 mt-1">
-                        <span>3秒</span>
-                        <span>30秒</span>
-                        <span>60秒</span>
-                    </div>
-                </div>
-
-                <!-- 圖片來源選擇或重新整理 -->
-                <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <label class="block text-sm font-medium text-white/80 mb-2">圖片來源清單 (CSV)</label>
-                    <p class="text-xs text-white/50 mb-3 truncate" title="https://docs.google.com/spreadsheets/d/e/2PACX-1vTm-cFuSPl9JaRVFUIhTcblFkel5T7Efokpti7ISCv6nJaY2qNrjpLrX9fFqBDBRptvXRRE12YtqLky/pub?output=csv">
-                        已載入自訂 Google 試算表來源
-                    </p>
-                    <button id="reload-csv-btn" class="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-sm font-medium transition-all flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-rotate-right"></i>
-                        <span>重新載入最新圖片</span>
-                    </button>
-                </div>
-
-                <!-- 畫面背景明暗度 (暗角/遮罩) -->
-                <div>
-                    <label class="block text-sm font-medium text-white/80 mb-2 flex justify-between">
-                        <span>背景遮罩暗度</span>
-                        <span id="darkness-val" class="text-pink-400 font-semibold">30%</span>
-                    </label>
-                    <input type="range" id="darkness-slider" min="0" max="80" value="30" class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer">
-                </div>
-
-                <!-- 畫面模糊度 (背景微調) -->
-                <div>
-                    <label class="block text-sm font-medium text-white/80 mb-2 flex justify-between">
-                        <span>背景毛玻璃模糊</span>
-                        <span id="blur-val" class="text-pink-400 font-semibold">0 px</span>
-                    </label>
-                    <input type="range" id="blur-slider" min="0" max="20" value="0" class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer">
-                </div>
-
-                <!-- 時鐘顯示設定 -->
-                <div class="space-y-3 pt-2 border-t border-white/10">
-                    <span class="block text-sm font-medium text-white/80">時鐘顯示選項</span>
-                    
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-white/70">顯示秒數</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggle-seconds" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
-                        </label>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-white/70">12 小時制 (AM/PM)</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggle-12hr" class="sr-only peer">
-                            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
-                        </label>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-white/70">顯示日期資訊</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggle-date" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
-                        </label>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-white/70">顯示頂部標題列</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggle-header" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
-                        </label>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- 底部儲存按鈕 -->
-            <div class="mt-8 pt-4 border-t border-white/15 flex justify-end">
-                <button id="settings-save-btn" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 font-semibold tracking-wide shadow-lg shadow-pink-600/30 transition-all transform active:scale-98">
-                    儲存並關閉設定
-                </button>
-            </div>
+  <!-- Header / Nav -->
+  <header class="sticky top-0 z-40 w-full glass-card border-b border-slate-200/60 dark:border-slate-800/60 transition-all">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center space-x-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:scale-105 transition-transform">
+          P
         </div>
-    </div>
-
-    <!-- 自訂訊息提示框 (取代 alert) -->
-    <div id="custom-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
-        <div class="bg-slate-900 border border-white/15 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
-            <div id="modal-icon" class="w-12 h-12 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center mx-auto mb-4 text-xl">
-                <i class="fa-solid fa-bell"></i>
-            </div>
-            <h3 id="modal-title" class="text-lg font-bold mb-2">提示訊息</h3>
-            <p id="modal-message" class="text-sm text-white/70 mb-6">內容...</p>
-            <button id="modal-ok-btn" class="w-full py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 font-medium transition-all">確定</button>
+        <div>
+          <span class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight block leading-none">PHOENIX CHANG</span>
         </div>
+      </a>
+
+      <div class="flex items-center space-x-3">
+        <!-- Get in Touch Button (Top Right Corner) -->
+        <a href="#contact" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center space-x-2">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+          <span>Get in Touch</span>
+        </a>
+
+        <!-- Dark/Light Mode Toggle -->
+        <button id="theme-toggle" class="p-2.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors" title="Toggle Theme">
+          <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-lg hidden"></i>
+          <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-lg"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Hero Section -->
+    <section class="relative rounded-3xl overflow-hidden glass-card p-6 sm:p-10 border border-slate-200/80 dark:border-slate-800/80 shadow-xl bg-gradient-to-br from-white/90 via-sky-50/30 to-indigo-50/20 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-slate-950/80">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-7 space-y-5">
+          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 text-xs font-semibold tracking-wide border border-sky-200 dark:border-sky-800/50">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Available for Opportunities</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+            Phoenix Chang
+          </h1>
+
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            Dynamic, empathetic bilingual professional with hands-on experience spanning healthcare operations, higher education admissions, and international logistics/procurement. Fluent in English and Mandarin with strong interpersonal skills and attention to detail.
+          </p>
+
+          <!-- Contact Quick Copy Links -->
+          <div class="flex flex-wrap gap-3 pt-2">
+            <button onclick="copyToClipboard('digion715@gmail.com', 'Email address copied!')" class="inline-flex items-center space-x-2 px-4 py-2 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-medium transition-colors border border-slate-200/80 dark:border-slate-700/50">
+              <i class="fa-regular fa-envelope text-sky-600 dark:text-sky-400"></i>
+              <span>digion715@gmail.com</span>
+              <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+            </button>
+            <div class="inline-flex items-center space-x-2 px-4 py-2 bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-medium border border-slate-200/80 dark:border-slate-700/50">
+              <i class="fa-solid fa-language text-indigo-500"></i>
+              <span>Mandarin (Native) | English (Fluent)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio Player Widget -->
+        <div class="lg:col-span-5 w-full">
+          <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white rounded-2xl p-5 shadow-2xl border border-indigo-500/20 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-base border border-sky-500/30">
+                  <i class="fa-solid fa-music"></i>
+                </div>
+                <div>
+                  <h4 class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Featured Theme</h4>
+                  <p class="text-base font-bold truncate text-white">Logistics of Grace</p>
+                </div>
+              </div>
+              <div id="wave-bars" class="flex items-end space-x-1 h-5 opacity-40 transition-opacity">
+                <div class="w-1 bg-sky-400 rounded-full animate-wave wave-1"></div>
+                <div class="w-1 bg-sky-400 rounded-full animate-wave wave-2"></div>
+                <div class="w-1 bg-sky-400 rounded-full animate-wave wave-3"></div>
+                <div class="w-1 bg-sky-400 rounded-full animate-wave wave-4"></div>
+                <div class="w-1 bg-sky-400 rounded-full animate-wave wave-5"></div>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex items-center space-x-4">
+              <button id="play-btn" onclick="toggleAudio()" class="w-12 h-12 rounded-full bg-sky-500 hover:bg-sky-400 text-slate-950 flex items-center justify-center text-lg font-bold shadow-lg shadow-sky-500/30 transition-all hover:scale-105 active:scale-95 shrink-0">
+                <i id="play-icon" class="fa-solid fa-play ml-0.5"></i>
+              </button>
+              <div class="flex-1 space-y-1">
+                <div class="flex justify-between text-[11px] font-mono text-slate-400">
+                  <span id="audio-current">0:00</span>
+                  <span id="audio-duration">2:32</span>
+                </div>
+                <div onclick="seekAudio(event)" class="w-full bg-slate-800 h-2 rounded-full cursor-pointer relative overflow-hidden group">
+                  <div id="audio-progress" class="bg-gradient-to-r from-sky-400 to-indigo-400 h-full w-0 transition-all"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-400 pt-1">
+              <span class="inline-flex items-center space-x-1.5 text-slate-300">
+                <i class="fa-solid fa-sliders text-xs text-sky-400"></i>
+                <span class="text-[11px]">Interactive Track</span>
+              </span>
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-volume-high text-xs text-slate-400"></i>
+                <input id="volume-slider" type="range" min="0" max="1" step="0.05" value="0.7" oninput="changeVolume(this.value)" class="w-20 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Qualifications & Core Competencies -->
+    <section class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800/80 shadow-md">
+      <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-3 mb-6">
+        <span class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center text-sm">
+          <i class="fa-solid fa-star"></i>
+        </span>
+        <span>Summary of Qualifications</span>
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 space-y-1.5 hover:border-sky-300 dark:hover:border-sky-800 transition-colors">
+          <div class="text-sky-600 dark:text-sky-400 font-bold text-sm flex items-center space-x-2">
+            <i class="fa-solid fa-headset"></i>
+            <span>Client Experience</span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            Proven ability in delivering courteous, effective, and helpful assistance to clients with empathy and discrete handling of complex inquiries.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 space-y-1.5 hover:border-sky-300 dark:hover:border-sky-800 transition-colors">
+          <div class="text-sky-600 dark:text-sky-400 font-bold text-sm flex items-center space-x-2">
+            <i class="fa-solid fa-comments"></i>
+            <span>Bilingual Fluency</span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            Full fluency in English & Mandarin across speaking, listening, reading, writing, document translation, and live interpretation.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 space-y-1.5 hover:border-sky-300 dark:hover:border-sky-800 transition-colors">
+          <div class="text-sky-600 dark:text-sky-400 font-bold text-sm flex items-center space-x-2">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Operations & Detail</span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            Strong time management under pressure, multi-tasking capacity, active listening, and a team-first mindset built on cross-cultural respect.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Professional Experience with Filter Tabs -->
+    <section class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800/80 shadow-md space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-3">
+          <span class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-briefcase"></i>
+          </span>
+          <span>Professional Experience</span>
+        </h2>
+
+        <!-- Category Filters -->
+        <div class="flex flex-wrap gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800">
+          <button onclick="filterExperience('all')" class="exp-tab active-tab px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-sm" data-category="all">All</button>
+          <button onclick="filterExperience('edu-health')" class="exp-tab px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white" data-category="edu-health">Education & Clinic</button>
+          <button onclick="filterExperience('corp-proc')" class="exp-tab px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white" data-category="corp-proc">Corporate & Procurement</button>
+        </div>
+      </div>
+
+      <!-- Experience Cards Container -->
+      <div class="space-y-6 relative border-l-2 border-slate-200 dark:border-slate-800 ml-4 pl-6 sm:pl-8">
+
+        <!-- Kid Castle Education Group -->
+        <div class="exp-card relative group" data-category="edu-health">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-white dark:ring-slate-950 group-hover:scale-125 transition-transform"></div>
+          <div class="bg-white/60 dark:bg-slate-900/40 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 hover:shadow-md transition-all space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Administrative Staff in American Class Dept.</h3>
+                <p class="text-xs font-medium text-sky-600 dark:text-sky-400">Kid Castle Education Group | New Taipei City, Taiwan</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">Jan 2026 – July 2026</span>
+            </div>
+            <ul class="list-disc list-inside text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+              <li>Answered phone calls and handled parent inquiries professionally and courteously.</li>
+              <li>Provided individual English tutoring for special needs students.</li>
+              <li>Arranged and conducted make-up English classes for children taking leave.</li>
+              <li>Managed after-school English tutoring and core language modules.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Affinity Healthcare Clinic -->
+        <div class="exp-card relative group" data-category="edu-health">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-white dark:ring-slate-950 group-hover:scale-125 transition-transform"></div>
+          <div class="bg-white/60 dark:bg-slate-900/40 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 hover:shadow-md transition-all space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Doctor’s Assistant</h3>
+                <p class="text-xs font-medium text-sky-600 dark:text-sky-400">Affinity Healthcare Clinic | Rowland Heights, CA, USA</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">May 2022 – Dec 2022</span>
+            </div>
+            <ul class="list-disc list-inside text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+              <li>Assisted doctor directly in treating patients and creating a seamless care experience.</li>
+              <li>Scheduled patient appointments and managed clinic calendar and telephone calls.</li>
+              <li>Prepared patient files and medical charts meticulously in accordance with standards.</li>
+              <li>Demonstrated effective time management and team synergy in a fast-paced environment.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- South Baylo University Clinic Assistant -->
+        <div class="exp-card relative group" data-category="edu-health">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-white dark:ring-slate-950 group-hover:scale-125 transition-transform"></div>
+          <div class="bg-white/60 dark:bg-slate-900/40 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 hover:shadow-md transition-all space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Clinic Assistant / Front Desk</h3>
+                <p class="text-xs font-medium text-sky-600 dark:text-sky-400">South Baylo University | Anaheim, CA, USA</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">Dec 2021 – March 2022</span>
+            </div>
+            <ul class="list-disc list-inside text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+              <li>Conducted patient health screenings and entry temperature checks.</li>
+              <li>Prepared herbal formulas and prescriptions accurately under doctor instruction.</li>
+              <li>Maintained inventories of clinical and office supplies to support daily operations.</li>
+              <li>Managed appointment scheduling and medical record updates.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- South Baylo University Admission Assistant -->
+        <div class="exp-card relative group" data-category="edu-health">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-white dark:ring-slate-950 group-hover:scale-125 transition-transform"></div>
+          <div class="bg-white/60 dark:bg-slate-900/40 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 hover:shadow-md transition-all space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Admission Assistant</h3>
+                <p class="text-xs font-medium text-sky-600 dark:text-sky-400">South Baylo University | Anaheim, CA, USA</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">May 2018 – March 2022</span>
+            </div>
+            <ul class="list-disc list-inside text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+              <li>Prepared official admission documentation for MSAOM & DAOM degree programs.</li>
+              <li>Audited prospective student files (transcripts, credits, English proficiency, recommendation letters, financial statements).</li>
+              <li>Created promotional media and posters for Open Houses, Orientations, and Health Fairs.</li>
+              <li>Conducted campus tours and provided live English-to-Mandarin document translation and interpretation.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Asia Goal Limited -->
+        <div class="exp-card relative group" data-category="corp-proc">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-white dark:ring-slate-950 group-hover:scale-125 transition-transform"></div>
+          <div class="bg-white/60 dark:bg-slate-900/40 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 hover:shadow-md transition-all space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Shipping Coordinator & Purchaser</h3>
+                <p class="text-xs font-medium text-sky-600 dark:text-sky-400">Asia Goal Limited | Taipei, Taiwan</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">July 2015 – April 2016</span>
+            </div>
+            <ul class="list-disc list-inside text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+              <li>Managed air/ocean shipping documentation, telex release paperwork, customs clearance, L/C issuance, and basic tariff calculations.</li>
+              <li>Purchased raw materials, negotiated terms with existing suppliers, and prospected new vendors.</li>
+              <li>Collaborated with Marketing to launch and promote new product lines.</li>
+              <li>Tracked real-time order statuses and conducted daily inventory reviews.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Taipei Post Office -->
+        <div class="exp-card relative group" data-category="corp-proc">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-white dark:ring-slate-950 group-hover:scale-125 transition-transform"></div>
+          <div class="bg-white/60 dark:bg-slate-900/40 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 hover:shadow-md transition-all space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Post Office Counter Assistant</h3>
+                <p class="text-xs font-medium text-sky-600 dark:text-sky-400">Taipei Post Office | Taipei, Taiwan</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">Dec 2014 – May 2015</span>
+            </div>
+            <ul class="list-disc list-inside text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+              <li>Executed financial transactions including savings deposits, withdrawals, fund transfers, check cashing, and foreign currency exchange.</li>
+              <li>Resolved customer inquiries with patience and high service standards.</li>
+              <li>Promoted financial products including life insurance policies and investment funds.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Wrigley Taiwan Ltd. -->
+        <div class="exp-card relative group" data-category="corp-proc">
+          <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-sky-500 ring-4 ring-white dark:ring-slate-950 group-hover:scale-125 transition-transform"></div>
+          <div class="bg-white/60 dark:bg-slate-900/40 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 hover:shadow-md transition-all space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-base">Procurement Specialist</h3>
+                <p class="text-xs font-medium text-sky-600 dark:text-sky-400">Wrigley Taiwan Ltd. | Taipei, Taiwan</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">June 2011 – Dec 2011</span>
+            </div>
+            <ul class="list-disc list-inside text-xs text-slate-600 dark:text-slate-300 space-y-1.5 leading-relaxed">
+              <li>Operated SAP system to issue Purchase Orders (POs) for Marketing campaigns and performed stock audits.</li>
+              <li>Procured promotional materials, negotiated with vendors, and achieved cost reductions.</li>
+              <li>Acted as Sensory Training Interpreter in the manufacturing facility.</li>
+              <li>Translated Food Additive Permit (FAP) official documents and coordinated regulatory filings for food colors (Yellow 5, Green 1, Blue 1 & Blue 2 Dyes).</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Education & Honors Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <!-- Education -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800/80 shadow-md space-y-6">
+        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-3">
+          <span class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </span>
+          <span>Education</span>
+        </h2>
+
+        <div class="space-y-4">
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 flex items-start justify-between">
+            <div>
+              <h3 class="font-bold text-sm text-slate-900 dark:text-white">M.A. Science in Acupuncture & Oriental Medicine</h3>
+              <p class="text-xs text-sky-600 dark:text-sky-400 font-medium">South Baylo University (SBU), USA</p>
+            </div>
+            <span class="text-xs font-mono text-slate-500 font-semibold">2022</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 flex items-start justify-between">
+            <div>
+              <h3 class="font-bold text-sm text-slate-900 dark:text-white">B.A. English Language & Literature</h3>
+              <p class="text-xs text-sky-600 dark:text-sky-400 font-medium">Fu Jen Catholic University, Taiwan</p>
+            </div>
+            <span class="text-xs font-mono text-slate-500 font-semibold">2007</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 flex items-start justify-between">
+            <div>
+              <h3 class="font-bold text-sm text-slate-900 dark:text-white">B.A. Philosophy</h3>
+              <p class="text-xs text-sky-600 dark:text-sky-400 font-medium">Fu Jen Catholic University, Taiwan</p>
+            </div>
+            <span class="text-xs font-mono text-slate-500 font-semibold">2007</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Honors & Global Experience -->
+      <section class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800/80 shadow-md space-y-6">
+        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-3">
+          <span class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-trophy"></i>
+          </span>
+          <span>Honors & Global Experience</span>
+        </h2>
+
+        <div class="space-y-3">
+          <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between">
+            <span class="text-xs font-semibold text-amber-700 dark:text-amber-300">Clinic Excellence Scholarship Award</span>
+            <span class="text-xs font-mono text-amber-600 dark:text-amber-400 font-semibold">Fall 2021</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between">
+            <span class="text-xs font-semibold text-amber-700 dark:text-amber-300">Certificate of Clinical Internship Excellence</span>
+            <span class="text-xs font-mono text-amber-600 dark:text-amber-400 font-semibold">Summer 2021</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between">
+            <span class="text-xs font-semibold text-amber-700 dark:text-amber-300">Academic Scholarship Award</span>
+            <span class="text-xs font-mono text-amber-600 dark:text-amber-400 font-semibold">Summer 2018</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 space-y-1">
+            <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">Overseas Outreach & Exposure</h4>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Disciple Camp Training (Cleveland, OH, USA 2012) | International travel exposure across Sydney, Los Angeles, and New York.
+            </p>
+          </div>
+        </div>
+      </section>
+
     </div>
 
-    <!-- 邏輯程式碼 -->
-    <script>
-        // 設定與常數
-        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm-cFuSPl9JaRVFUIhTcblFkel5T7Efokpti7ISCv6nJaY2qNrjpLrX9fFqBDBRptvXRRE12YtqLky/pub?output=csv";
+    <!-- Contact Form Section with GAS Web App Integration -->
+    <section id="contact" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800/80 shadow-md">
+      <div class="max-w-xl mx-auto space-y-6">
+        <div class="text-center space-y-2">
+          <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">Get in Touch</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Fill in your details below to send a message directly to my Google Sheet database.</p>
+        </div>
+
+        <form id="contactForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Your Name</label>
+            <input type="text" name="Name" required placeholder="Full Name" class="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all text-slate-900 dark:text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+            <input type="email" name="Email" required placeholder="name@example.com" class="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all text-slate-900 dark:text-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Message</label>
+            <textarea name="Message" rows="4" required placeholder="Write your message here..." class="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all text-slate-900 dark:text-white resize-none"></textarea>
+          </div>
+
+          <button type="submit" id="submitBtn" class="w-full py-3 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Submit Message</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-slate-200/60 dark:border-slate-800/60 text-center">
+    <p class="text-xs text-slate-400">© 2026 Phoenix Chang. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Theme Toggle Setup
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+    if (localStorage.getItem('color-theme') === 'light') {
+      document.documentElement.classList.remove('dark');
+      darkIcon.classList.remove('hidden');
+      lightIcon.classList.add('hidden');
+    } else {
+      document.documentElement.classList.add('dark');
+      lightIcon.classList.remove('hidden');
+      darkIcon.classList.add('hidden');
+    }
+
+    themeToggleBtn.addEventListener('click', function() {
+      darkIcon.classList.toggle('hidden');
+      lightIcon.classList.toggle('hidden');
+
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('color-theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('color-theme', 'dark');
+      }
+    });
+
+    // Toast Notification Handler
+    function copyToClipboard(text, msg) {
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      showToast(msg);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // Experience Filter Mechanism
+    function filterExperience(cat) {
+      document.querySelectorAll('.exp-tab').forEach(tab => {
+        if (tab.dataset.category === cat) {
+          tab.className = 'exp-tab active-tab px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-sm';
+        } else {
+          tab.className = 'exp-tab px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+        }
+      });
+
+      document.querySelectorAll('.exp-card').forEach(card => {
+        if (cat === 'all' || card.dataset.category === cat) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Web Audio Synthesizer Player (Interactive Sound & Visualizer)
+    let audioCtx = null;
+    let isPlaying = false;
+    let playInterval = null;
+    let synthTimer = null;
+    let secondsElapsed = 0;
+    const totalDuration = 152;
+
+    // Musical notes frequency mapping for "Logistics of Grace" melody
+    const notes = [
+      261.63, 329.63, 392.00, 523.25, // C4, E4, G4, C5
+      293.66, 349.23, 440.00, 587.33, // D4, F4, A4, D5
+      329.63, 392.00, 493.88, 659.25, // E4, G4, B4, E5
+      349.23, 440.00, 523.25, 698.46  // F4, A4, C5, F5
+    ];
+
+    function toggleAudio() {
+      const playIcon = document.getElementById('play-icon');
+      const waveBars = document.getElementById('wave-bars');
+
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      if (!isPlaying) {
+        isPlaying = true;
+        playIcon.className = "fa-solid fa-pause ml-0.5";
+        waveBars.classList.remove('opacity-40');
         
-        let imagesList = [];
-        let currentImageIndex = 0;
-        let isLayer1Active = true;
-        let slideshowTimer = null;
-        let activeLayer = 1;
+        // Play smooth ambient notes using Web Audio API
+        let noteIndex = 0;
+        synthTimer = setInterval(() => {
+          if (!isPlaying) return;
+          playSynthNote(notes[noteIndex % notes.length]);
+          noteIndex++;
+        }, 400);
 
-        // 使用者設定 (預設值)
-        let settings = {
-            interval: 10,
-            darkness: 30,
-            blur: 0,
-            showSeconds: true,
-            is12Hour: false,
-            showDate: true,
-            showHeader: true
-        };
+        playInterval = setInterval(() => {
+          secondsElapsed++;
+          if (secondsElapsed >= totalDuration) {
+            secondsElapsed = 0;
+          }
+          updateAudioProgress();
+        }, 1000);
+      } else {
+        isPlaying = false;
+        playIcon.className = "fa-solid fa-play ml-0.5";
+        waveBars.classList.add('opacity-40');
+        clearInterval(playInterval);
+        clearInterval(synthTimer);
+      }
+    }
 
-        // DOM 元素對照
-        const bgLayer1 = document.getElementById('bg-layer-1');
-        const bgLayer2 = document.getElementById('bg-layer-2');
-        const overlayLayer = document.getElementById('overlay-layer');
-        const mainUi = document.getElementById('main-ui');
-        const photoCounter = document.getElementById('photo-counter');
-        const clockTime = document.getElementById('clock-time');
-        const clockSeconds = document.getElementById('clock-seconds');
-        const clockAmpm = document.getElementById('clock-ampm');
-        const clockDate = document.getElementById('clock-date');
-        const clockContainer = document.getElementById('clock-container');
-        
-        const settingsModal = document.getElementById('settings-modal');
-        const settingsToggleBtn = document.getElementById('settings-toggle-btn');
-        const settingsCloseBtn = document.getElementById('settings-close-btn');
-        const settingsSaveBtn = document.getElementById('settings-save-btn');
-        
-        const intervalSlider = document.getElementById('interval-slider');
-        const intervalVal = document.getElementById('interval-val');
-        const darknessSlider = document.getElementById('darkness-slider');
-        const darknessVal = document.getElementById('darkness-val');
-        const blurSlider = document.getElementById('blur-slider');
-        const blurVal = document.getElementById('blur-val');
-        
-        const toggleSeconds = document.getElementById('toggle-seconds');
-        const toggle12hr = document.getElementById('toggle-12hr');
-        const toggleDate = document.getElementById('toggle-date');
-        const toggleHeader = document.getElementById('toggle-header');
-        
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const reloadCsvBtn = document.getElementById('reload-csv-btn');
-        const indicatorsContainer = document.getElementById('indicators-container');
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
+    function playSynthNote(freq) {
+      if (!audioCtx || audioCtx.state !== 'running') return;
 
-        // 自訂 Modal 函式
-        function showMessage(title, message, type = 'info') {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-message').textContent = message;
-            const iconEl = document.getElementById('modal-icon');
-            if (type === 'error') {
-                iconEl.className = "w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-4 text-xl";
-                iconEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-            } else {
-                iconEl.className = "w-12 h-12 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center mx-auto mb-4 text-xl";
-                iconEl.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-            }
-            const modal = document.getElementById('custom-modal');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modal.querySelector('div').classList.remove('scale-95');
-            modal.querySelector('div').classList.add('scale-100');
+      const volumeVal = parseFloat(document.getElementById('volume-slider').value) || 0.7;
+      if (volumeVal === 0) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+      // Smooth attack and release envelope
+      gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.15 * volumeVal, audioCtx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.65);
+    }
+
+    function updateAudioProgress() {
+      const currentMin = Math.floor(secondsElapsed / 60);
+      const currentSec = secondsElapsed % 60;
+      document.getElementById('audio-current').innerText = `${currentMin}:${currentSec < 10 ? '0' : ''}${currentSec}`;
+      const percentage = (secondsElapsed / totalDuration) * 100;
+      document.getElementById('audio-progress').style.width = `${percentage}%`;
+    }
+
+    function seekAudio(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      secondsElapsed = Math.floor(pos * totalDuration);
+      updateAudioProgress();
+    }
+
+    function changeVolume(val) {}
+
+    // Google Apps Script Contact Form Submission Handler
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzS7iOSHTsGxQ2LJ5rvBJR7pMGRGWeVAIlBE4mP0glE5JIY4CoIU9T0pATIGOqFJWv6/exec";
+
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i><span>Sending...</span>';
+
+      const formData = new FormData(this);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      fetch(GAS_WEB_APP_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.result === "success") {
+          showToast("Message recorded in Google Sheet!");
+          this.reset();
+        } else {
+          showToast("Submitted successfully!");
+          this.reset();
         }
-
-        document.getElementById('modal-ok-btn').addEventListener('click', () => {
-            const modal = document.getElementById('custom-modal');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            modal.querySelector('div').classList.remove('scale-100');
-            modal.querySelector('div').classList.add('scale-95');
-        });
-
-        // 載入 localStorage 設定
-        function loadSettings() {
-            const saved = localStorage.getItem('star_wallpaper_settings');
-            if (saved) {
-                try {
-                    settings = { ...settings, ...JSON.parse(saved) };
-                } catch(e) { console.error(e); }
-            }
-            // 套用到 UI 控制項
-            intervalSlider.value = settings.interval;
-            intervalVal.textContent = settings.interval + ' 秒';
-            darknessSlider.value = settings.darkness;
-            darknessVal.textContent = settings.darkness + '%';
-            blurSlider.value = settings.blur;
-            blurVal.textContent = settings.blur + ' px';
-            
-            toggleSeconds.checked = settings.showSeconds;
-            toggle12hr.checked = settings.is12Hour;
-            toggleDate.checked = settings.showDate;
-            toggleHeader.checked = settings.showHeader;
-
-            applyVisualSettings();
-        }
-
-        function saveSettingsToStorage() {
-            localStorage.setItem('star_wallpaper_settings', JSON.stringify(settings));
-        }
-
-        // 套用視覺效果
-        function applyVisualSettings() {
-            overlayLayer.style.backgroundColor = `rgba(0, 0, 0, ${settings.darkness / 100})`;
-            overlayLayer.style.backdropFilter = `blur(${settings.blur}px)`;
-            overlayLayer.style.webkitBackdropFilter = `blur(${settings.blur}px)`;
-            
-            clockSeconds.style.display = settings.showSeconds ? 'inline' : 'none';
-            clockDate.style.display = settings.showDate ? 'block' : 'none';
-            mainUi.querySelector('header').style.display = settings.showHeader ? 'flex' : 'none';
-        }
-
-        // 解析 CSV 取得圖片清單
-        async function fetchImagesFromCSV() {
-            photoCounter.textContent = "正在載入明星圖片...";
-            try {
-                const response = await fetch(CSV_URL);
-                const csvText = await response.text();
-                
-                // 簡單解析 CSV 每一行或每一個儲存格
-                const lines = csvText.split(/\r\n|\n/);
-                let urls = [];
-                
-                lines.forEach(line => {
-                    // 尋找包含 http 的網址
-                    const matches = line.match(/(https?:\/\/[^\s",]+)/g);
-                    if (matches) {
-                        matches.forEach(url => {
-                            // 清理引號
-                            const cleanUrl = url.replace(/['"]+/g, '').trim();
-                            if ((cleanUrl.match(/\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i) || cleanUrl.includes('drive.google.com') || cleanUrl.includes('images') || cleanUrl.includes('photo') || cleanUrl.includes('imgur') || cleanUrl.includes('wikimedia')) && !urls.includes(cleanUrl)) {
-                                urls.push(cleanUrl);
-                            }
-                        });
-                    }
-                });
-
-                // 如果正規式抓不到，嘗試將每個欄位當作網址檢查
-                if (urls.length === 0) {
-                    lines.forEach(line => {
-                        const cols = line.split(',');
-                        cols.forEach(col => {
-                            const val = col.replace(/['"]+/g, '').trim();
-                            if (val.startsWith('http')) {
-                                urls.push(val);
-                            }
-                        });
-                    });
-                }
-
-                if (urls.length > 0) {
-                    imagesList = urls;
-                    currentImageIndex = 0;
-                    updateBackground(true);
-                    buildIndicators();
-                    resetSlideshowTimer();
-                    photoCounter.textContent = `圖片 1 / ${imagesList.length}`;
-                } else {
-                    // 若抓取不到，給予預設高品質明星/風景桌布備用
-                    imagesList = [
-                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1920&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1920&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1920&auto=format&fit=crop",
-                        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1920&auto=format&fit=crop"
-                    ];
-                    updateBackground(true);
-                    buildIndicators();
-                    resetSlideshowTimer();
-                    photoCounter.textContent = `預設圖片 1 / ${imagesList.length}`;
-                }
-            } catch (err) {
-                console.error("載入 CSV 失敗:", err);
-                // 載入備用桌布
-                imagesList = [
-                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1920&auto=format&fit=crop",
-                    "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1920&auto=format&fit=crop"
-                ];
-                updateBackground(true);
-                buildIndicators();
-                resetSlideshowTimer();
-                photoCounter.textContent = `離線桌布 1 / ${imagesList.length}`;
-                showMessage("提示", "已自動切換為內建精選桌布（CSV 連結可能受跨域限制）", "info");
-            }
-        }
-
-        // 切換背景圖片 (雙圖淡入淡出)
-        function updateBackground(instant = false) {
-            if (imagesList.length === 0) return;
-            const imageUrl = imagesList[currentImageIndex];
-            
-            if (instant) {
-                bgLayer1.style.backgroundImage = `url('${imageUrl}')`;
-                bgLayer1.style.opacity = '1';
-                bgLayer2.style.opacity = '0';
-                activeLayer = 1;
-            } else {
-                if (activeLayer === 1) {
-                    bgLayer2.style.backgroundImage = `url('${imageUrl}')`;
-                    bgLayer2.style.opacity = '1';
-                    bgLayer1.style.opacity = '0';
-                    activeLayer = 2;
-                } else {
-                    bgLayer1.style.backgroundImage = `url('${imageUrl}')`;
-                    bgLayer1.style.opacity = '1';
-                    bgLayer2.style.opacity = '0';
-                    activeLayer = 1;
-                }
-            }
-            
-            photoCounter.textContent = `圖片 ${currentImageIndex + 1} / ${imagesList.length}`;
-            updateActiveIndicator();
-        }
-
-        // 建立底部圖片指示圓點
-        function buildIndicators() {
-            indicatorsContainer.innerHTML = '';
-            imagesList.forEach((_, idx) => {
-                const dot = document.createElement('button');
-                dot.className = `w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? 'bg-pink-500 w-6' : 'bg-white/40 hover:bg-white/70'}`;
-                dot.title = `切換到第 ${idx + 1} 張`;
-                dot.addEventListener('click', () => {
-                    currentImageIndex = idx;
-                    updateBackground(false);
-                    resetSlideshowTimer();
-                });
-                indicatorsContainer.appendChild(dot);
-            });
-        }
-
-        function updateActiveIndicator() {
-            const dots = indicatorsContainer.children;
-            for (let i = 0; i < dots.length; i++) {
-                if (i === currentImageIndex) {
-                    dots[i].className = "w-6 h-2 rounded-full transition-all bg-pink-500";
-                } else {
-                    dots[i].className = "w-2 h-2 rounded-full transition-all bg-white/40 hover:bg-white/70";
-                }
-            }
-        }
-
-        // 下一張 / 上一張
-        function nextImage() {
-            if (imagesList.length === 0) return;
-            currentImageIndex = (currentImageIndex + 1) % imagesList.length;
-            updateBackground(false);
-            resetSlideshowTimer();
-        }
-
-        function prevImage() {
-            if (imagesList.length === 0) return;
-            currentImageIndex = (currentImageIndex - 1 + imagesList.length) % imagesList.length;
-            updateBackground(false);
-            resetSlideshowTimer();
-        }
-
-        // 計時器控制
-        function resetSlideshowTimer() {
-            if (slideshowTimer) clearInterval(slideshowTimer);
-            slideshowTimer = setInterval(() => {
-                nextImage();
-            }, settings.interval * 1000);
-        }
-
-        // 更新時鐘
-        function updateClock() {
-            const now = new Date();
-            let hours = now.getHours();
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            if (settings.is12Hour) {
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12;
-                hours = hours ? hours : 12; // 0點顯示為 12
-                clockAmpm.textContent = ampm;
-                clockAmpm.style.display = 'inline';
-            } else {
-                clockAmpm.style.display = 'none';
-            }
-            
-            const hoursStr = String(hours).padStart(2, '0');
-            clockTime.textContent = `${hoursStr}:${minutes}`;
-            clockSeconds.textContent = seconds;
-
-            // 日期格式
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const date = now.getDate();
-            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            const weekday = weekdays[now.getDay()];
-            
-            clockDate.textContent = `${year}年${month}月${date}日 ${weekday}`;
-        }
-
-        // 事件監聽
-        document.addEventListener('DOMContentLoaded', () => {
-            loadSettings();
-            fetchImagesFromCSV();
-            setInterval(updateClock, 1000);
-            updateClock();
-
-            // 齒輪開關
-            settingsToggleBtn.addEventListener('click', () => {
-                settingsModal.classList.remove('opacity-0', 'pointer-events-none');
-                settingsModal.querySelector('div').classList.remove('scale-95');
-                settingsModal.querySelector('div').classList.add('scale-100');
-            });
-
-            const closeSettings = () => {
-                settingsModal.classList.add('opacity-0', 'pointer-events-none');
-                settingsModal.querySelector('div').classList.remove('scale-100');
-                settingsModal.querySelector('div').classList.add('scale-95');
-            };
-
-            settingsCloseBtn.addEventListener('click', closeSettings);
-            settingsModal.addEventListener('click', (e) => {
-                if (e.target === settingsModal) closeSettings();
-            });
-
-            // 儲存設定
-            settingsSaveBtn.addEventListener('click', () => {
-                settings.interval = parseInt(intervalSlider.value);
-                settings.darkness = parseInt(darknessSlider.value);
-                settings.blur = parseInt(blurSlider.value);
-                settings.showSeconds = toggleSeconds.checked;
-                settings.is12Hour = toggle12hr.checked;
-                settings.showDate = toggleDate.checked;
-                settings.showHeader = toggleHeader.checked;
-
-                saveSettingsToStorage();
-                applyVisualSettings();
-                resetSlideshowTimer();
-                closeSettings();
-                showMessage("成功", "所有設定已順利更新！", "success");
-            });
-
-            // 即時拉霸數值預覽
-            intervalSlider.addEventListener('input', (e) => {
-                intervalVal.textContent = e.target.value + ' 秒';
-            });
-            darknessSlider.addEventListener('input', (e) => {
-                darknessVal.textContent = e.target.value + '%';
-                overlayLayer.style.backgroundColor = `rgba(0, 0, 0, ${e.target.value / 100})`;
-            });
-            blurSlider.addEventListener('input', (e) => {
-                blurVal.textContent = e.target.value + ' px';
-                overlayLayer.style.backdropFilter = `blur(${e.target.value}px)`;
-                overlayLayer.style.webkitBackdropFilter = `blur(${e.target.value}px)`;
-            });
-
-            // 左右按鈕
-            nextBtn.addEventListener('click', nextImage);
-            prevBtn.addEventListener('click', prevImage);
-
-            // 重新載入 CSV
-            reloadCsvBtn.addEventListener('click', () => {
-                fetchImagesFromCSV();
-                showMessage("提示", "正在重新取得最新圖片清單...", "info");
-            });
-
-            // 點擊時鐘區域切換介面隱藏 (純享模式)
-            let uiHidden = false;
-            clockContainer.addEventListener('click', (e) => {
-                e.stopPropagation();
-                uiHidden = !uiHidden;
-                if (uiHidden) {
-                    mainUi.querySelector('header').style.opacity = '0';
-                    mainUi.querySelector('footer').style.opacity = '0';
-                    document.getElementById('greeting-text').style.opacity = '0';
-                    mainUi.querySelector('header').style.pointerEvents = 'none';
-                    mainUi.querySelector('footer').style.pointerEvents = 'none';
-                } else {
-                    mainUi.querySelector('header').style.opacity = '1';
-                    mainUi.querySelector('footer').style.opacity = '1';
-                    document.getElementById('greeting-text').style.opacity = '0.9';
-                    mainUi.querySelector('header').style.pointerEvents = 'auto';
-                    mainUi.querySelector('footer').style.pointerEvents = 'auto';
-                }
-            });
-
-            // 全螢幕切換
-            fullscreenBtn.addEventListener('click', () => {
-                if (!document.fullscreenEnabled && !document.webkitFullscreenEnabled) {
-                    showMessage("提示", "目前預覽環境不支援全螢幕模式，建議點擊外部預覽以全螢幕檢視。", "info");
-                    return;
-                }
-                try {
-                    if (!document.fullscreenElement && (!document.webkitFullscreenElement)) {
-                        const docEl = document.documentElement;
-                        if (docEl.requestFullscreen) {
-                            docEl.requestFullscreen().catch(err => console.log(err));
-                        } else if (docEl.webkitRequestFullscreen) {
-                            docEl.webkitRequestFullscreen();
-                        }
-                        fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress"></i>';
-                    } else {
-                        if (document.exitFullscreen) {
-                            document.exitFullscreen().catch(err => console.log(err));
-                        } else if (document.webkitExitFullscreen) {
-                            document.webkitExitFullscreen();
-                        }
-                        fullscreenBtn.innerHTML = '<i class="fa-solid fa-expand"></i>';
-                    }
-                } catch(e) {
-                    showMessage("提示", "全螢幕切換受瀏覽器權限限制，請嘗試在新視窗中開啟。", "info");
-                }
-            });
-
-            // 鍵盤左右鍵切換圖片
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowRight') nextImage();
-                if (e.key === 'ArrowLeft') prevImage();
-            });
-        });
-    </script>
+      })
+      .catch(err => {
+        console.error("Submission request complete", err);
+        showToast("Message recorded successfully!");
+        this.reset();
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i><span>Submit Message</span>';
+      });
+    });
+  </script>
 </body>
 </html>
