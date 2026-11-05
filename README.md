@@ -87,6 +87,4 @@ To connect the contact form to your own Google Sheet:
 
 ---
 
-## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
